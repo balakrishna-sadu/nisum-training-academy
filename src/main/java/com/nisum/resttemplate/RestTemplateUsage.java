@@ -125,7 +125,6 @@ public class RestTemplateUsage {
 
 	@RequestMapping(value = "/full-details-of-training/{tid}",method = RequestMethod.GET)
 	public String fullDetailsOfTraining(@PathVariable int tid) {
-
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		HttpEntity<Trainer> entity = new HttpEntity<Trainer>(headers);
