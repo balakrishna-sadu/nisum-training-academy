@@ -1,6 +1,7 @@
 package com.nisum.model;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,8 +12,9 @@ public class Trainer {
 	int trainerId;
 	String name;
 	String dept;
-	String[] feedback;
+	List<String> feedback = new ArrayList<>();
 
+	
 	public Trainer() {
 		
 	}
@@ -41,21 +43,20 @@ public class Trainer {
 		this.dept = dept;
 	}
 
-	public String[] getFeedback() {
+	public List<String> getFeedback() {
 		return feedback;
 	}
 
-	public void setFeedback(String[] feedback) {
+	public void setFeedback(List<String> feedback) {
 		this.feedback = feedback;
 	}
 
 	@Override
 	public String toString() {
-		return "Trainer [trainerId=" + trainerId + ", name=" + name + ", dept=" + dept + ", feedback="
-				+ Arrays.toString(feedback) + "]";
+		return "{\n\ttrainerId : " + trainerId + ",\n\tname : " + name + ",\n\tdept : " + dept + ",\n\tfeedback:" + feedback.toString()+ "\n}";
 	}
 
-	public Trainer(int trainerId, String name, String dept, String[] feedback) {
+	public Trainer(int trainerId, String name, String dept, List<String> feedback) {
 		super();
 		this.trainerId = trainerId;
 		this.name = name;

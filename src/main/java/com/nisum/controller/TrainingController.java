@@ -1,16 +1,21 @@
 package com.nisum.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.nisum.model.Course;
 import com.nisum.model.Trainer;
@@ -20,6 +25,7 @@ import com.nisum.repo.TrainersRepo;
 import com.nisum.repo.TrainingScheduleRepo;
 
 @RestController
+@RequestMapping("/training-scheduler")
 public class TrainingController {
 	
 	@Autowired
@@ -33,13 +39,13 @@ public class TrainingController {
 	public String scheduleTraining(@RequestBody Training tr) {
 		Training training = new Training();
 		training.setId(tr.getId());
-		training.setTrainer_name(tr.getTrainer_name());
-		training.setCourse_name(tr.getCourse_name());
-		training.setDate_time(tr.getDate_time());
+		training.setTrainerName(tr.getTrainerName());
+		training.setCourseName(tr.getCourseName());
+		training.setDateTime(tr.getDateTime());
 		
 		tsrepo.save(training);
 		
-		return "Training scheduled to "+ tr.getDate_time();
+		return "Training scheduled to "+ tr.getDateTime();
 	}
 	
 	@GetMapping("/get-scheduled-trainings")
@@ -47,15 +53,36 @@ public class TrainingController {
 		return tsrepo.findAll();
 	}
 	
+	@GetMapping("/getSingleTraining/{id}")
+	public Optional<Training> getTraining(@PathVariable int id) {
+		return tsrepo.findById(id);
+	}
+	@DeleteMapping("/deleteAllTrainings")
+	public String deleteAllTrainings() {
+		tsrepo.deleteAll();
+		return "All trainings deleted ";
+	}
+	
+	@DeleteMapping("/delete-single-training/{name}")
+	public String deleteSingleTrainig(@PathVariable String name) {
+		Training training = tsrepo.findByCourseName(name);
+		tsrepo.deleteByCourseName(name);
+		return training.getCourseName()+" Course Deleted";
+	}
+	
+	@DeleteMapping("/deleteTraining/{name}")
+	public Training deleteTrainingByName(@PathVariable String name) {
+		Training training = tsrepo.findByCourseName(name);
+		tsrepo.deleteByCourseName(name);
+		return training;	
+	}
 	@GetMapping("/getfulldetails/{id}")
 	public String getFullDetails(@PathVariable int id) {
 
 		Optional<Training> t = tsrepo.findById(id);
-		
-		Trainer trainer = trepo.findByName(t.get().getTrainer_name());
-		
-		Course course = crepo.findByCoursename(t.get().getCourse_name());
-		
+		Trainer trainer = trepo.findByName(t.get().getTrainerName());
+		Course course = crepo.findByCoursename(t.get().getCourseName());
+				
 		return "Scheduled Training\n"+"Training ID : "+t.get().getId()
 				
 				+"\n\nTrainer : \n"
@@ -66,16 +93,34 @@ public class TrainingController {
 				+"\n\n Course :\n"
 				+"\t course id:"+course.getCourseId()
 				+"\t course name:"+course.getCoursename()
-				+"\n\n Date-Time : "+t.get().getDate_time();
+				+"\n\n Date-Time : "+t.get().getDateTime();
 	}
 	
 	@PutMapping("/takefeedbackfor/{trainername}")
-	public Trainer feedBackforTrainer(@PathVariable String trainername,@RequestParam String[] feedback) {
+	public Trainer feedBackforTrainer(@PathVariable String trainername,@RequestParam String feedbackComment) {
 		Trainer tr = trepo.findByName(trainername);
-		tr.setFeedback(feedback);
+		List sample = new ArrayList<>();
+		sample = tr.getFeedback();
+		sample.add(feedbackComment);
+		tr.setFeedback(sample);
 		trepo.save(tr);
+		
+		RestTemplate rst = new RestTemplate();
+		String url = "http://localhost:8080/email/sendFeedbackEmail-for/"+trainername;
+		String mailStatus = rst.exchange(url+"?feedback={fdbck}",HttpMethod.POST,null,String.class,feedbackComment).getBody();
+		System.out.println("*****> mailStatus = "+mailStatus);
 		return tr;
 	}
+	
+	@PutMapping("/change-schedule/{scheduledTrainingName}/{date}")
+	public Training changeScheduleDate(@PathVariable String date,@PathVariable String scheduledTrainingName,@RequestParam String newDate) {
+	
+		Training training = tsrepo.findByCourseName(scheduledTrainingName);
+		training.setDateTime(newDate);
+		tsrepo.save(training);
+		return training;
+	}
+	
 	
 	//Check : can we access another controller methods
 	@Autowired

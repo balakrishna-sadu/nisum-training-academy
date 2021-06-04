@@ -1,5 +1,6 @@
 package com.nisum.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,9 +38,9 @@ public class Controller {
 		return "Trainer : " + tr.getName() + " inserted sucessfully";
 	}
 
-	@GetMapping("/trainer/{id}")
-	public Optional<Trainer> getTrainer(@PathVariable int id) {
-		return trepo.findById(id);
+	@GetMapping("/trainer/{name}")
+	public Trainer getTrainer(@PathVariable String name) {
+		return trepo.findByName(name);
 	}
 
 	@GetMapping("/courses")
@@ -56,8 +57,12 @@ public class Controller {
 	@PutMapping("/updatetrainer/{id}")
 	public Trainer updateTrainerfeedback(@PathVariable int id) {
 		Optional<Trainer> tr = trepo.findById(id);
-		String[] array = { "good", "skillful" };
-		tr.get().setFeedback(array);
+		
+	    List<String> feedback = new ArrayList<>();
+	    feedback.add("Good");
+	    feedback.add("Skillful");
+	    feedback.add("well explained");
+		tr.get().setFeedback(feedback);
 		trepo.save(tr.get());
 		return tr.get();
 	}
