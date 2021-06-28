@@ -72,11 +72,11 @@ public class RestTemplateUsage {
 	}
 
 	@RequestMapping(value = "/updatetrainerbyid/{tid}",method = RequestMethod.PUT)
-	public String updateTrainer(@PathVariable int tid) {
+	public String updateTrainer(@PathVariable int tid,@RequestBody Trainer trainer) {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		HttpEntity<Trainer> entity = new HttpEntity<Trainer>(headers);
+		HttpEntity<Trainer> entity = new HttpEntity<Trainer>(trainer,headers);
 		return restTemplate.exchange("http://localhost:8080/updatetrainer/" + tid, HttpMethod.PUT, entity, String.class)
 				.getBody();
 	}
@@ -152,6 +152,14 @@ public class RestTemplateUsage {
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		HttpEntity<Training> entity = new HttpEntity<Training>(headers);
 		return restTemplate.exchange("http://localhost:8080/training-scheduler/delete-single-training/"+name,HttpMethod.DELETE,entity,String.class).getBody();
+	}
+	
+	@RequestMapping(value = "/change-training-time/{courseName}/{newDateTime}",method = RequestMethod.PUT)
+	public String changeDateTimeOfTraining(@PathVariable String newDateTime,@PathVariable String courseName) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		HttpEntity<Training> entity = new HttpEntity<Training>(headers);
+		return restTemplate.exchange("http://localhost:8080/training-scheduler/change-date-time/"+courseName+"/"+newDateTime, HttpMethod.PUT, entity, String.class).getBody();
 	}
 		
 	

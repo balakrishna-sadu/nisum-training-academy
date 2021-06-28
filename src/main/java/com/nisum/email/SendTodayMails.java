@@ -29,9 +29,9 @@ public class SendTodayMails {
 	@RequestMapping("/sendtodaymails")
 	public String sendTodayMails() {
 
-		List<Training> lst = tsrepo.findAll();
+		List<Training> trainings = tsrepo.findAll();
 
-		for (Training training : lst) {
+		for (Training training : trainings) {
 
 			String dateTime = training.getDateTime();
 			Boolean result = SendTodayMails.calculateDate(dateTime);

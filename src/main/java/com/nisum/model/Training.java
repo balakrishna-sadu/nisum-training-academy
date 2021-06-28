@@ -48,8 +48,8 @@ public class Training {
 	
 	@Override
 	public String toString() {
-		return "Training [id=" + id + ", trainerName=" + trainerName + ", courseName=" + courseName + ", dateTime="
-				+ dateTime + "]";
+		return "{\n\tid : " + id + ",\n\ttrainerName : " + trainerName + ",\n\tcourseName : " + courseName + ",\n\tdateTime : "
+				+ dateTime + "\n}";
 	}
 	public Training() {
 		super();

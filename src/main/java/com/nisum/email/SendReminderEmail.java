@@ -31,7 +31,7 @@ public class SendReminderEmail {
 		mail.setTo("sbalakrishna@nisum.com");
 		mail.setFrom("s.balu9963@gmail.com");
 		mail.setSubject("Scheduled Training Reminder");
-		mail.setText("Hi Balakrishna, You are receiving this mail on behalf of some of your colleague\n\n\t\t\t"
+		mail.setText("Hi Balakrishna,\n\n\t\t*******Daily Reminder*******\n\n You are receiving this mail on behalf of some of your colleague\n\n\t\t\t"
 				+ "Trainer : "+training.getTrainerName().toUpperCase()
 				+" This is to inform you that the training that you have been assigned :"+training.getCourseName()
 				+" is on Tomorrow i.e., "+training.getDateTime()
@@ -43,6 +43,30 @@ public class SendReminderEmail {
 		}catch(MailException e) {
 			System.out.println("Error while sending mail....."+e.getMessage());
 		}
-		return "reminder Mail sent for Trainer : "+training.getTrainerName();
+		return "daily reminder Mail sent for Trainer : "+training.getTrainerName();
 	}
+	
+	@RequestMapping(value = "/send-weekly-reminder-email", method = RequestMethod.POST)
+	public String sendWeeklyReminderEmail(@RequestBody Training training) {
+		
+		SimpleMailMessage mail = new SimpleMailMessage();
+		
+		mail.setTo("sbalakrishna@nisum.com");
+		mail.setFrom("s.balu9963@gmail.com");
+		mail.setSubject("Scheduled Training Reminder");
+		mail.setText("Hi Balakrishna,\n\n\t\t*******Weekly Reminder*******\n\n You are receiving this mail on behalf of some of your colleague\n\n\t\t\t"
+				+ "Trainer : "+training.getTrainerName().toUpperCase()
+				+" This is to inform you that the training that you have been assigned :"+training.getCourseName()
+				+" is on "+training.getDateTime()
+				+"\n\n\t\t\tKindly be prepared."
+				+"\n\nTHANK YOU FOR RECEIVING MAIL");
+		try {
+			mailSender.send(mail);
+		}catch(MailException e) {
+			System.out.println("Error while sending mail....."+e.getMessage());
+		}
+		return "weekly reminder Mail sent for Trainer : "+training.getTrainerName();
+	}
+	
+	
 }

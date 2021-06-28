@@ -1,6 +1,5 @@
 package com.nisum.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +26,8 @@ public class Controller {
 	@Autowired
 	CoursesRepo crepo;
 	
+	
+	//*************** TRAINER *****************//
 	@GetMapping("/trainers")
 	public List<Trainer> getAllTrainers() {
 		return trepo.findAll();
@@ -42,27 +43,14 @@ public class Controller {
 	public Trainer getTrainer(@PathVariable String name) {
 		return trepo.findByName(name);
 	}
-
-	@GetMapping("/courses")
-	public List<Course> getAllCourses() {
-		return crepo.findAll();
-	}
-
-	@PostMapping("/courses")
-	public String insretCourse(@RequestBody Course cr) {
-		crepo.save(cr);
-		return cr.getCoursename() + " Course inserted successfully";
-	}
-
+	
 	@PutMapping("/updatetrainer/{id}")
-	public Trainer updateTrainerfeedback(@PathVariable int id) {
+	public Trainer updateTrainerfeedback(@PathVariable int id,@RequestBody Trainer trainer) {
 		Optional<Trainer> tr = trepo.findById(id);
-		
-	    List<String> feedback = new ArrayList<>();
-	    feedback.add("Good");
-	    feedback.add("Skillful");
-	    feedback.add("well explained");
-		tr.get().setFeedback(feedback);
+
+		tr.get().setName(trainer.getName());
+		tr.get().setDept(trainer.getDept());
+		tr.get().setFeedback(trainer.getFeedback());
 		trepo.save(tr.get());
 		return tr.get();
 	}
@@ -73,7 +61,18 @@ public class Controller {
 		trepo.deleteById(id);
 		return "Trainer : "+t.get().getName()+" deleted !!";
 	}
-	
+
+	//*********************** COURSE **************************//
+	@GetMapping("/courses")
+	public List<Course> getAllCourses() {
+		return crepo.findAll();
+	}
+
+	@PostMapping("/courses")
+	public String insretCourse(@RequestBody Course cr) {
+		crepo.save(cr);
+		return cr.getCoursename() + " Course inserted successfully";
+	}
 	@DeleteMapping("/deletecourse/{name}")
 	public String deleteCourseByName(@PathVariable String name) {
 		Course c = crepo.findByCoursename(name);

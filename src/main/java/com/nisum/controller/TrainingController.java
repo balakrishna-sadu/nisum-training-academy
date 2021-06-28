@@ -112,15 +112,14 @@ public class TrainingController {
 		return tr;
 	}
 	
-	@PutMapping("/change-schedule/{scheduledTrainingName}/{date}")
-	public Training changeScheduleDate(@PathVariable String date,@PathVariable String scheduledTrainingName,@RequestParam String newDate) {
-	
+	@PutMapping("/change-date-time/{scheduledTrainingName}/{date}")
+	public Training changeScheduleDate(@PathVariable String date,@PathVariable String scheduledTrainingName) {
 		Training training = tsrepo.findByCourseName(scheduledTrainingName);
-		training.setDateTime(newDate);
+		System.out.println("before changing time : "+training);
+		training.setDateTime(date);
 		tsrepo.save(training);
 		return training;
 	}
-	
 	
 	//Check : can we access another controller methods
 	@Autowired

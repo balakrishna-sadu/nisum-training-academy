@@ -22,7 +22,7 @@ public class Course {
 	}
 	@Override
 	public String toString() {
-		return "Course [courseId=" + courseId + ", coursename=" + coursename + "]";
+		return "{\n\tcourseId : " + courseId + ",\n\tcoursename : " + coursename + "\n}";
 	}
 	public Course(int courseId, String coursename) {
 		super();
