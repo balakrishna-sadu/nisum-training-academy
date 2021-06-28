@@ -27,14 +27,14 @@ import com.nisum.repo.TrainingScheduleRepo;
 @RestController
 @RequestMapping("/training-scheduler")
 public class TrainingController {
-	
+
 	@Autowired
 	TrainingScheduleRepo tsrepo;
 	@Autowired
 	TrainersRepo trepo;
 	@Autowired
 	CoursesRepo crepo;
-	
+
 	@PostMapping("/schedule-training")
 	public String scheduleTraining(@RequestBody Training tr) {
 		Training training = new Training();
@@ -42,91 +42,110 @@ public class TrainingController {
 		training.setTrainerName(tr.getTrainerName());
 		training.setCourseName(tr.getCourseName());
 		training.setDateTime(tr.getDateTime());
-		
+
 		tsrepo.save(training);
-		
-		return "Training scheduled to "+ tr.getDateTime();
+
+		return "Training scheduled to " + tr.getDateTime();
 	}
-	
+
 	@GetMapping("/get-scheduled-trainings")
-	public List<Training> getAllScheduledTrainings(){
+	public List<Training> getAllScheduledTrainings() {
 		return tsrepo.findAll();
 	}
-	
+
 	@GetMapping("/getSingleTraining/{id}")
 	public Optional<Training> getTraining(@PathVariable int id) {
 		return tsrepo.findById(id);
 	}
+
 	@DeleteMapping("/deleteAllTrainings")
 	public String deleteAllTrainings() {
 		tsrepo.deleteAll();
 		return "All trainings deleted ";
 	}
-	
+
 	@DeleteMapping("/delete-single-training/{name}")
 	public String deleteSingleTrainig(@PathVariable String name) {
 		Training training = tsrepo.findByCourseName(name);
 		tsrepo.deleteByCourseName(name);
-		return training.getCourseName()+" Course Deleted";
+		return training.getCourseName() + " Course Deleted";
 	}
-	
+
 	@DeleteMapping("/deleteTraining/{name}")
 	public Training deleteTrainingByName(@PathVariable String name) {
 		Training training = tsrepo.findByCourseName(name);
 		tsrepo.deleteByCourseName(name);
-		return training;	
+		return training;
 	}
+
 	@GetMapping("/getfulldetails/{id}")
 	public String getFullDetails(@PathVariable int id) {
 
 		Optional<Training> t = tsrepo.findById(id);
 		Trainer trainer = trepo.findByName(t.get().getTrainerName());
 		Course course = crepo.findByCoursename(t.get().getCourseName());
-				
-		return "Scheduled Training\n"+"Training ID : "+t.get().getId()
-				
-				+"\n\nTrainer : \n"
-				+"\t id:"+trainer.getTrainerId()
-				+ "\t name:"+trainer.getName()
-				+"\t dept:"+trainer.getDept()
-				
-				+"\n\n Course :\n"
-				+"\t course id:"+course.getCourseId()
-				+"\t course name:"+course.getCoursename()
-				+"\n\n Date-Time : "+t.get().getDateTime();
+
+		return "Scheduled Training\n" + "Training ID : " + t.get().getId()
+
+				+ "\n\nTrainer : \n" + "\t id:" + trainer.getTrainerId() + "\t name:" + trainer.getName() + "\t dept:"
+				+ trainer.getDept()
+
+				+ "\n\n Course :\n" + "\t course id:" + course.getCourseId() + "\t course name:"
+				+ course.getCoursename() + "\n\n Date-Time : " + t.get().getDateTime();
 	}
-	
+
 	@PutMapping("/takefeedbackfor/{trainername}")
-	public Trainer feedBackforTrainer(@PathVariable String trainername,@RequestParam String feedbackComment) {
+	public Trainer feedBackforTrainer(@PathVariable String trainername, @RequestParam String feedbackComment) {
 		Trainer tr = trepo.findByName(trainername);
 		List sample = new ArrayList<>();
 		sample = tr.getFeedback();
 		sample.add(feedbackComment);
 		tr.setFeedback(sample);
 		trepo.save(tr);
-		
+
 		RestTemplate rst = new RestTemplate();
-		String url = "http://localhost:8080/email/sendFeedbackEmail-for/"+trainername;
-		String mailStatus = rst.exchange(url+"?feedback={fdbck}",HttpMethod.POST,null,String.class,feedbackComment).getBody();
-		System.out.println("*****> mailStatus = "+mailStatus);
+		String url = "http://localhost:8080/email/sendFeedbackEmail-for/" + trainername;
+		String mailStatus = rst
+				.exchange(url + "?feedback={fdbck}", HttpMethod.POST, null, String.class, feedbackComment).getBody();
+		System.out.println("*****> mailStatus = " + mailStatus);
 		return tr;
 	}
-	
+
 	@PutMapping("/change-date-time/{scheduledTrainingName}/{date}")
-	public Training changeScheduleDate(@PathVariable String date,@PathVariable String scheduledTrainingName) {
+	public Training changeScheduleDate(@PathVariable String date, @PathVariable String scheduledTrainingName) {
 		Training training = tsrepo.findByCourseName(scheduledTrainingName);
-		System.out.println("before changing time : "+training);
+		System.out.println("before changing time : " + training);
 		training.setDateTime(date);
 		tsrepo.save(training);
 		return training;
 	}
+
+	@PutMapping("/change-status/{courseName}")
+	public Training changeStatus(@PathVariable String courseName, @RequestParam String status) {
+		Training training = tsrepo.findByCourseName(courseName);
+		System.out.println("before changing status : " + training);
+		training.setStatus(status);
+		tsrepo.save(training);
+		return training;
+	}
 	
-	//Check : can we access another controller methods
+	@PutMapping("/change-trainer/{oldTrainer}")
+	public Training changeTrainer(@PathVariable String oldTrainer, @RequestParam String newTrainer) {
+		Training training = tsrepo.findByTrainerName(oldTrainer);
+		System.out.println("before changing status : " + training);
+		training.setTrainerName(newTrainer);
+		tsrepo.save(training);
+		return training;
+	}
+	
+
+	// Check : can we access another controller methods
 	@Autowired
 	Controller controller;
+
 	@GetMapping("/checkthis")
 	public List<Trainer> checking() {
 		return this.controller.getAllTrainers();
 	}
-	
+
 }

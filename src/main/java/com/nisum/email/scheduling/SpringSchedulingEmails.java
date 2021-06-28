@@ -29,25 +29,29 @@ public class SpringSchedulingEmails {
 	String todayDate = dateFormat.format(date);
 
 	// daily reminder
-
-	@Scheduled(cron = "0 31 20 ? * 2-7") // sending mails daily from Monday to Friday at our specified time
-	public void sendTodayEmails() {
+	
+	@Scheduled(cron = "0 6 15 ? * MON-FRI") // sending mails daily from Monday to Friday at our specified time
+	public void sendTodayEmailss() {
 
 		System.out.println("Today Converted DATE : " + todayDate);
 
-		List<Training> trainings = tsrepo.findAll();
+		List<Training> trainings = tsrepo.findByStatus("NOT STARTED");
+
+		System.out.println("Length of not started training list : " + trainings.size());
 
 		for (Training training : trainings) {
 			System.out.println("checking training : " + training.getId() + " dateTime : " + training.getDateTime());
 
 			if (training.getDateTime().contains(todayDate)) {
+				System.out.println("Yes today "+training.getCourseName()+" training is there !!");
 				sendDailyReminderEmail(training);
 			}
 		}
 	}
 
 	// weekly reminder
-	@Scheduled(cron = "0 30 9 ? * 1") // sending mails on sunday morning 9:30 AM
+	
+	@Scheduled(cron = "0 30 9 ? * SUN") // sending mails on sunday morning 9:30 AM
 	public void weeklyReminder() {
 
 		List<Training> trainings = tsrepo.findAll();

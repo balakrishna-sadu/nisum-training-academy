@@ -11,12 +11,20 @@ public class Training {
 	String trainerName;
 	String courseName;
 	String dateTime;
-	public Training(int id, String trainer_name, String course_name, String date_time) {
+	String status;
+	public Training(int id, String trainer_name, String course_name, String date_time,String status) {
 		super();
 		this.id = id;
 		this.trainerName = trainer_name;
 		this.courseName = course_name;
 		this.dateTime = date_time;
+		this.status = status;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	public int getId() {
 		return id;
@@ -49,7 +57,7 @@ public class Training {
 	@Override
 	public String toString() {
 		return "{\n\tid : " + id + ",\n\ttrainerName : " + trainerName + ",\n\tcourseName : " + courseName + ",\n\tdateTime : "
-				+ dateTime + "\n}";
+				+ dateTime + "\n\tstatus : "+status+"\n}";
 	}
 	public Training() {
 		super();
